@@ -1,12 +1,22 @@
 # coding:utf-8
 
 import os
-from PySide import QtGui, QtCore
+
+try:
+    from PySide.QtGui import *
+    from PySide.QtCore import *
+    from shiboken import wrapInstance
+except:
+    from PySide2.QtGui import *
+    from PySide2.QtCore import *
+    from PySide2.QtWidgets import *
+    from shiboken2 import wrapInstance
+    
 import animButton
 reload(animButton)
 from animButton import AnimButton
 
-class AnimListWidget(QtGui.QListWidget):
+class AnimListWidget(QListWidget):
     
     def __init__(self, parent = None):
         super(AnimListWidget, self).__init__(parent)
@@ -16,9 +26,9 @@ class AnimListWidget(QtGui.QListWidget):
     
     def setDefault(self):
         self.setSelectionRectVisible(True)
-        policy = QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Minimum)
+        policy = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         self.setSizePolicy(policy)
-        self.itemSize = QtCore.QSize(128,128)
+        self.itemSize = QSize(128,128)
         self.setGridSize(self.itemSize)
 
         self.setLayoutMode(self.Batched)
@@ -47,7 +57,7 @@ class AnimListWidget(QtGui.QListWidget):
             return
         self.clear()
         for widget in widgets:
-            item = QtGui.QListWidgetItem()
+            item = QListWidgetItem()
             item.setSizeHint(widget.sizeHint())
             self.addItem(item)
             self.setItemWidget(item, widget)
@@ -56,7 +66,7 @@ class AnimListWidget(QtGui.QListWidget):
         
         
     def wheelEvent(self, event):
-        stepSize = QtCore.QSize(10,10)
+        stepSize = QSize(10,10)
         if self.childrenWidget == None:
             return
         
@@ -74,7 +84,7 @@ class AnimListWidget(QtGui.QListWidget):
             widget.setSize(self.itemSize)
         
 def main():
-    app = QtGui.QApplication([])
+    app = QApplication([])
     listWidget = AnimListWidget()
     
     buttons = []
@@ -83,7 +93,7 @@ def main():
         basePath = "../reference/images"
         frames = os.listdir(basePath)
         animButton.setFrames(basePath, frames)
-        animButton.setSize(QtCore.QSize(128, 128))
+        animButton.setSize(QSize(128, 128))
         buttons.append(animButton)
 
         print i

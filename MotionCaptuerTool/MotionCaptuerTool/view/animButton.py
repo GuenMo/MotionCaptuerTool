@@ -1,11 +1,21 @@
 # coding:utf-8
 
 import os
-from PySide import QtGui, QtCore
+
+try:
+    from PySide.QtGui import *
+    from PySide.QtCore import *
+    from shiboken import wrapInstance
+except:
+    from PySide2.QtGui import *
+    from PySide2.QtCore import *
+    from PySide2.QtWidgets import *
+    from shiboken2 import wrapInstance
+    
 import Control.motionCapture as mocap
 reload(mocap)
 
-class AnimButton(QtGui.QPushButton):
+class AnimButton(QPushButton):
     
     def __init__(self, speed = 30, parent = None):
         super(AnimButton, self).__init__(parent)
@@ -15,7 +25,7 @@ class AnimButton(QtGui.QPushButton):
         self.pad = 3
         self.minSize = 8
         
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.setSizePolicy(sizePolicy)
         
         self.__index  = 0
@@ -27,7 +37,7 @@ class AnimButton(QtGui.QPushButton):
         self.__frameSize      = None # 이미지 싸이즈 (with, height)
         self.__numberOfFrames = None # 이미지 개수 int
         
-        self._timer = QtCore.QTimer()
+        self._timer = QTimer()
         self._timer.setInterval(self.__speed)
         self._timer.timeout.connect(self.runAnim)
     
@@ -61,11 +71,11 @@ class AnimButton(QtGui.QPushButton):
         processed = [] # QIcons[]
         
         for i,f in enumerate(frames):
-            pix = QtGui.QPixmap(os.path.join(basePath,f))
+            pix = QPixmap(os.path.join(basePath,f))
             if i == 0:
-                if pix.size() != QtCore.QSize(0,0):
-                    self.__frameSize = QtCore.QSize(50,50)
-            im = QtGui.QIcon(pix)
+                if pix.size() != QSize(0,0):
+                    self.__frameSize = QSize(50,50)
+            im = QIcon(pix)
             processed.append(im)
         
         self.__numberOfFrames = len(processed)
@@ -84,7 +94,7 @@ class AnimButton(QtGui.QPushButton):
             self.setIconSize(self.__frameSize)
     
     def mousePressEvent(self, event):
-        if event.button() == QtCore.Qt.LeftButton:
+        if event.button() == Qt.LeftButton:
             dirName = os.path.dirname(self.__basePath)
             fileName = self.__framesPath[0].partition('.')[0]
             
@@ -125,19 +135,19 @@ class AnimButton(QtGui.QPushButton):
         self.__index = 0
     
     def paintEvent(self, event):
-        qp = QtGui.QPainter()
+        qp = QPainter()
         qp.begin(self)
         ## get default style
-        opt = QtGui.QStyleOptionButton()
+        opt = QStyleOptionButton()
         self.initStyleOption(opt)
         ## scale icon to button size 
         Rect = opt.rect
         h = Rect.height()
         w = Rect.width()
         iconSize = max(min(h, w) - 2 * self.pad, self.minSize)
-        opt.iconSize = QtCore.QSize(iconSize, iconSize)
+        opt.iconSize = QSize(iconSize, iconSize)
         ## draw button
-        self.style().drawControl(QtGui.QStyle.CE_PushButton, opt, qp, self)
+        self.style().drawControl(QStyle.CE_PushButton, opt, qp, self)
         qp.end()
     
     def setSpeed(self, speed):
@@ -150,7 +160,7 @@ class AnimButton(QtGui.QPushButton):
         return self.__basePath
 
 def main():
-    app = QtGui.QApplication([])
+    app = QApplication([])
     temp = AnimButton(24)
     basePath = "../reference/images"
     frames = os.listdir(basePath)
@@ -158,7 +168,7 @@ def main():
     temp.setFrames(basePath, frames)
     temp.show()
     
-    temp.setSize(QtCore.QSize(100, 100))
+    temp.setSize(QSize(100, 100))
     temp.setSpeed(10)
     app.exec_()
     

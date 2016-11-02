@@ -1,22 +1,32 @@
 # coding:utf-8
 
 import os
-from PySide import QtGui
 
-class FolderSearchWidget(QtGui.QWidget):
+try:
+    from PySide.QtGui import *
+    from PySide.QtCore import *
+    from shiboken import wrapInstance
+except:
+    from PySide2.QtGui import *
+    from PySide2.QtCore import *
+    from PySide2.QtWidgets import *
+    from shiboken2 import wrapInstance
+
+
+class FolderSearchWidget(QWidget):
     
     def __init__(self, parent = None):
         super(FolderSearchWidget, self).__init__(parent)
         
         self.imagePath = FolderSearchWidget.getImagePath()
         
-        layout = QtGui.QHBoxLayout()
+        layout = QHBoxLayout()
         self.setLayout(layout)
         
-        self.pathLinedit = QtGui.QLineEdit()
-        self.searchButton = QtGui.QPushButton()
-        buttonImage = QtGui.QPixmap(os.path.join(self.imagePath,'open.png'))
-        buttonIcon  = QtGui.QIcon(buttonImage)
+        self.pathLinedit = QLineEdit()
+        self.searchButton = QPushButton()
+        buttonImage = QPixmap(os.path.join(self.imagePath,'open.png'))
+        buttonIcon  = QIcon(buttonImage)
         self.searchButton.setIcon(buttonIcon)
         
         layout.addWidget(self.pathLinedit)
@@ -27,7 +37,7 @@ class FolderSearchWidget(QtGui.QWidget):
     
     def __openFolderDialog(self):
         oldDir = self.pathLinedit.text()
-        selectedDir = QtGui.QFileDialog.getExistingDirectory()
+        selectedDir = QFileDialog.getExistingDirectory()
         if selectedDir:
             self.pathLinedit.setText(selectedDir)
         else:
@@ -46,7 +56,7 @@ class FolderSearchWidget(QtGui.QWidget):
         return os.path.join(cls.getRootPath(),'view/images')
 
 def main():
-    app = QtGui.QApplication([])
+    app = QApplication([])
     widget = FolderSearchWidget()
     widget.show()
     app.exec_()

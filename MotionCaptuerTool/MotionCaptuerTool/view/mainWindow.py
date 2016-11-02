@@ -1,9 +1,18 @@
 # coding:utf-8
 
-from PySide import QtGui, QtCore
+try:
+    from PySide.QtGui import *
+    from PySide.QtCore import *
+    from shiboken import wrapInstance
+except:
+    from PySide2.QtGui import *
+    from PySide2.QtCore import *
+    from PySide2.QtWidgets import *
+    from shiboken2 import wrapInstance
+
+
 import os
 import maya.OpenMayaUI as OpenMayaUI
-from shiboken import wrapInstance
 
 import animListWidget
 reload(animListWidget)
@@ -26,7 +35,7 @@ __version__ = "1.2.0"
 
 def getMayaWindow():
     ptr = OpenMayaUI.MQtUtil.mainWindow()
-    return wrapInstance(long(ptr), QtGui.QMainWindow)
+    return wrapInstance(long(ptr), QMainWindow)
 
 def mayaToQtObject( inMayaUI ):
     ptr = OpenMayaUI.MQtUtil.findControl( inMayaUI )
@@ -35,10 +44,10 @@ def mayaToQtObject( inMayaUI ):
     if ptr is None:
         ptr= OpenMayaUI.MQtUtil.findMenuItem( inMayaUI )
     if ptr is not None:
-        return wrapInstance( long( ptr ), QtGui.QWidget )
+        return wrapInstance( long( ptr ), QWidget )
 
 
-class MainWindow(QtGui.QMainWindow):
+class MainWindow(QMainWindow):
     
     def __init__(self, size=128, parent = getMayaWindow()):
         super(MainWindow, self).__init__(parent)
@@ -56,7 +65,7 @@ class MainWindow(QtGui.QMainWindow):
         # Central Widget
         self.animListWidget = AnimListWidget()
         self.animListWidget.setMinimumSize(500,500)
-        self.animListWidget.setContextMenuPolicy(QtCore.Qt.ActionsContextMenu)
+        self.animListWidget.setContextMenuPolicy(Qt.ActionsContextMenu)
         self.setCentralWidget(self.animListWidget)
         
         # Status Bar
@@ -70,7 +79,7 @@ class MainWindow(QtGui.QMainWindow):
         quitAction      = self.createAction( "Quit", slot=self.close, icon="quit",tip=u"프로그램을 종료 합니다.")     
         
         # Add File Type Actions
-        self.fileTypeGroup = QtGui.QActionGroup(self)
+        self.fileTypeGroup = QActionGroup(self)
         hikAction = self.createAction( "HIK", slot=self.setHIK, icon="HIK", tip=u"HIK 타입 파일로 설정 합니다.", checkable=True, signal="toggled")
         aniAction = self.createAction( "ANI", slot=self.setANI, icon="ANI", tip=u"Clip 타입 파일로 설정 합니다.", checkable=True, signal="toggled")
         fbxAction = self.createAction( "FBX", slot=self.setFBX, icon="FBX", tip=u"FBX 타입 파일로 설정 합니다.",     checkable=True, signal="toggled")
@@ -80,7 +89,7 @@ class MainWindow(QtGui.QMainWindow):
         hikAction.setChecked(True)
         
         # Add Operation Actions
-        self.operationGroup = QtGui.QActionGroup(self)
+        self.operationGroup = QActionGroup(self)
         openPoseAction      = self.createAction( "Open", slot=self.setOpen, icon="open", tip=u"파일 처리를 open 으로 설정 합니다.", checkable=True, signal="toggled")
         importPoseAction    = self.createAction( "Import", slot=self.setImport, icon="import", tip=u"파일 처리를 import 로 설정 합니다.", checkable=True, signal="toggled")
         referencePoseAction = self.createAction( "Reference", slot=self.setReference, icon="reference", tip=u"파일 처리를 reference 설정 합니다.", checkable=True, signal="toggled")
@@ -118,7 +127,7 @@ class MainWindow(QtGui.QMainWindow):
         
         # Add Animation Speed Tool Bar
         animSpeedToolbar = self.addToolBar("AnimSpeed")
-        self.animSpeedSlider = QtGui.QDial()
+        self.animSpeedSlider = QDial()
         self.animSpeedSlider.setSingleStep(1)
         self.animSpeedSlider.setFixedSize(40,40)
         self.animSpeedSlider.setMinimum(1)
@@ -129,7 +138,7 @@ class MainWindow(QtGui.QMainWindow):
         
         # Add Path Tool Bar
         pathToolbar = self.addToolBar("Path")
-        self.pathLineEdit = QtGui.QLineEdit(self.__assetPath)
+        self.pathLineEdit = QLineEdit(self.__assetPath)
         pathToolbar.addWidget(self.pathLineEdit)
         
         # Add RMB Click Menu
@@ -140,9 +149,9 @@ class MainWindow(QtGui.QMainWindow):
         self.setGeometry(500, 500, 1000, 500)
         
     def createAction(self, text, slot=None, shortcut=None, icon=None, tip=None, checkable=False, signal="triggered"):
-        action = QtGui.QAction(text, self)
+        action = QAction(text, self)
         if icon is not None:
-            action.setIcon(QtGui.QIcon("{}/{}.png".format(self.__imagePath,icon)))
+            action.setIcon(QIcon("{}/{}.png".format(self.__imagePath,icon)))
         if shortcut is not None:
             action.setShortcut(shortcut)
         if tip is not None:
@@ -159,7 +168,7 @@ class MainWindow(QtGui.QMainWindow):
             if action is None:
                 target.addSeparator()
             elif action == "separator":
-                separator = QtGui.QAction(self)
+                separator = QAction(self)
                 separator.setSeparator(True)
                 target.addAction(separator) 
             else:
@@ -177,7 +186,7 @@ class MainWindow(QtGui.QMainWindow):
             self.printStaus(u"작업이 실패 또는 취소 됬습니다.", "red")
         
     def loadAsset(self):
-        loadPath = QtGui.QFileDialog.getExistingDirectory(dir=self.__previewPath)
+        loadPath = QFileDialog.getExistingDirectory(dir=self.__previewPath)
         
         if loadPath:
             self.animListWidget.clear()
@@ -191,7 +200,7 @@ class MainWindow(QtGui.QMainWindow):
                 basePath = os.path.join(loadPath,basePath)
                 frames = os.listdir(basePath)
                 animButton.setFrames(basePath, frames)
-                animButton.setSize(QtCore.QSize(128, 128))
+                animButton.setSize(QSize(128, 128))
                 buttons.append(animButton)
             self.animListWidget.setItems(buttons)
         else:
@@ -261,7 +270,7 @@ def main():
         basePath = 'D:/151006_Mocap_Data/preview/A_01_M_Stand_Look_Breath_01_M_03_preview'
         frames = os.listdir(basePath)
         animButton.setFrames(basePath, frames)
-        animButton.setSize(QtCore.QSize(128, 128))
+        animButton.setSize(QSize(128, 128))
         buttons.append(animButton)
         print i
     win.animListWidget.setItems(buttons)"""
