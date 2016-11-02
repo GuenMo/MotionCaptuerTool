@@ -275,5 +275,3 @@ def main():
         print i
     win.animListWidget.setItems(buttons)"""
     win.show()
-
-main()
